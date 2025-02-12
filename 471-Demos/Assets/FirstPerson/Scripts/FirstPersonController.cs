@@ -1,25 +1,40 @@
 using System;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 
 public class FirstPersonController : MonoBehaviour
 {
+    [SerializeField] private int health = 5;
     [SerializeField] private float speed = 2.0f;
+    [SerializeField] private float jumpHeight = 5.0f;
+    [SerializeField] private float JumpPadForce = 6.0f;
     [SerializeField] private GameObject camera;
     [SerializeField] private float mouseSensitivity = 100f;
     [SerializeField] private GameObject bulletSpawner;
     [SerializeField] private GameObject bullet;
+    [SerializeField] private Texture2D crosshairTexture;
+    [SerializeField] private float crosshairScale = 0.2f;
     
     private Vector2 movement;
     private Vector2 mouseMovement;
     private float cameraUpRotation = 0;
     private CharacterController controller;
+    private bool jumped = false;
+    private bool jumpPadBoosted = false;
+    
+    private float verticalVelocity = 0;     
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        
+        // Change the look of the cursor and lock it to the middle of the screen when the game starts
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.SetCursor(crosshairTexture, Vector2.zero, CursorMode.Auto);
     }
 
     // Update is called once per frame
@@ -39,6 +54,26 @@ public class FirstPersonController : MonoBehaviour
         float moveZ = movement.y;
 
         Vector3 actual_movement = (transform.forward * moveZ) + (transform.right * moveX);
+
+        if (controller.isGrounded)
+        {
+            if (jumped)
+            {
+                verticalVelocity = jumpHeight; 
+                jumped = false;
+            }
+            else if (jumpPadBoosted)
+            {
+                verticalVelocity = JumpPadForce;
+                jumpPadBoosted = false;
+            }
+            else
+                verticalVelocity = -0.5f;
+        }
+        else
+            verticalVelocity += Physics.gravity.y * Time.deltaTime;
+
+        actual_movement.y = verticalVelocity;
         controller.Move(actual_movement * (Time.deltaTime * speed));
     }
 
@@ -56,4 +91,27 @@ public class FirstPersonController : MonoBehaviour
     {
         Instantiate(bullet, bulletSpawner.transform.position, bulletSpawner.transform.rotation);
     }
+
+    void OnJump()
+    {
+        jumped = true;
+    }
+    
+    void OnGUI()
+    {
+        float width = crosshairTexture.width * crosshairScale;
+        float height = crosshairTexture.height * crosshairScale;
+        float x = (Screen.width - width) / 2;
+        float y = (Screen.height - height) / 2;
+        GUI.DrawTexture(new Rect(x, y, width, height), crosshairTexture);
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (other.gameObject.CompareTag("JumpPad"))
+            jumpPadBoosted = true;
+    }
+    
 }

@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - Killer
   - JumpPad
+  - Enemy
+  - PlayerBullet
   layers:
   - Default
   - TransparentFX

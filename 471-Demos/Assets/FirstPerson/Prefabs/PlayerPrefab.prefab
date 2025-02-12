@@ -132,11 +132,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0abf7fe5bd7862f44a57d4b354dda5ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  health: 5
+  speed: 10
   camera: {fileID: 9107065966274398448}
   mouseSensitivity: 100
   bulletSpawner: {fileID: 7628282865910775213}
   bullet: {fileID: 9125413225445305841, guid: ff202330c2c1a824391b8bd8cb632ac1, type: 3}
+  crosshairTexture: {fileID: 2800000, guid: ba3dba329ac5609499d5f1c19c7bf643, type: 3}
+  crosshairScale: 0.2
 --- !u!143 &183608302845627723
 CharacterController:
   m_ObjectHideFlags: 0
