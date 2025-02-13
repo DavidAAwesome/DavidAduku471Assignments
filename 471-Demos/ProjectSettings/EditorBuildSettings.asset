@@ -9,10 +9,10 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 0
-    path: Assets/RollaBall_Demo/RollaBall.unity
+    path: Assets/Class Projects/RollaBall_Demo/RollaBall.unity
     guid: 6b32ea5ec59f0014e95eefddc53516c2
   - enabled: 1
-    path: Assets/FirstPerson/FPS.unity
+    path: Assets/Class Projects/FirstPerson/FPS.unity
     guid: 04ddb175c7b27dd4fbd37185bac40f6d
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
