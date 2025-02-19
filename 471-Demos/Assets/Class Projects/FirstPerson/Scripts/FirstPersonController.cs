@@ -7,7 +7,7 @@ using UnityEngine.TextCore.Text;
 
 public class FirstPersonController : MonoBehaviour
 {
-    [SerializeField] private int health = 5;
+    [SerializeField] public int health = 5;
     [SerializeField] private float speed = 2.0f;
     [SerializeField] private float jumpHeight = 5.0f;
     [SerializeField] private float JumpPadForce = 6.0f;
@@ -25,12 +25,15 @@ public class FirstPersonController : MonoBehaviour
     private bool jumped = false;
     private bool jumpPadBoosted = false;
     
-    private float verticalVelocity = 0;     
+    private float verticalVelocity = 0;
+
+    private GameStateManager gamestateManager;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        gamestateManager = GameStateManager.Instance;
         
         // Change the look of the cursor and lock it to the middle of the screen when the game starts
         Cursor.lockState = CursorLockMode.Locked;
@@ -40,6 +43,21 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (gamestateManager.currentState == GameStateManager.GameState.Playing || gamestateManager.currentState == GameStateManager.GameState.Won)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.SetCursor(crosshairTexture, Vector2.zero, CursorMode.Auto);
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        }
+
+        if (transform.position.y < -20)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            
         float lookX = mouseMovement.x * Time.deltaTime * mouseSensitivity;
         float lookY = mouseMovement.y * Time.deltaTime * mouseSensitivity;
         
@@ -89,7 +107,8 @@ public class FirstPersonController : MonoBehaviour
 
     void OnAttack()
     {
-        Instantiate(bullet, bulletSpawner.transform.position, bulletSpawner.transform.rotation);
+        if(gamestateManager.currentState == GameStateManager.GameState.Playing || gamestateManager.currentState == GameStateManager.GameState.Won)
+            Instantiate(bullet, bulletSpawner.transform.position, bulletSpawner.transform.rotation);
     }
 
     void OnJump()
@@ -108,10 +127,18 @@ public class FirstPersonController : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.CompareTag("Enemy"))
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         if (other.gameObject.CompareTag("JumpPad"))
             jumpPadBoosted = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            health--;
+            Debug.Log("Collided with Enemy!!");
+        }
     }
     
 }

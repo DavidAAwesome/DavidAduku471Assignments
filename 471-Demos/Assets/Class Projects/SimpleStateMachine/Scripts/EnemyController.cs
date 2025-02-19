@@ -2,7 +2,15 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    [SerializeField] private GameObject bullet;
+    [SerializeField] private Transform bulletPosition;
+    [SerializeField] private float shootSpeed = 8f;
+    [SerializeField] private float bulletAirTime = 3f;
+    [SerializeField] private float shotCooldown = 2f;
+
+    private float timer = 0f;
     [SerializeField] private int speed = 1;
+    public int health = 5;
     
     [SerializeField] private GameObject[] route;
     private GameObject target;
@@ -25,6 +33,11 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (health <= 0)
+        {
+            GameStateManager.Instance.enemyCount--;
+            Destroy(gameObject);
+        }
         switch (currentState)
         {
             case State.Pace:
@@ -39,7 +52,7 @@ public class EnemyController : MonoBehaviour
     void OnPace()
     {
         //What do we do when we're pacing?
-        print("I'm pacing!");
+        // print("I'm pacing!");
         target = route[routeIndex];
         
         MoveTo(target);
@@ -66,7 +79,7 @@ public class EnemyController : MonoBehaviour
     void OnFollow()
     {
         //What do we do when we are following?
-        print("I'm following!");
+        // print("I'm following!");
         MoveTo(target);
         
         
@@ -77,6 +90,23 @@ public class EnemyController : MonoBehaviour
         {
             currentState = State.Pace;
         }
+        
+        if (timer <= 0f)
+        {
+            Vector3 direction = (target.transform.position - transform.position).normalized;
+
+            GameObject creation = Instantiate(bullet, bulletPosition.position + bulletPosition.forward * 0.5f, Quaternion.LookRotation(direction));
+            creation.transform.localScale = transform.localScale;
+    
+            Rigidbody objectRb = creation.GetComponent<Rigidbody>();
+            objectRb.mass = 0.1f; 
+            objectRb.AddForce(direction * shootSpeed, ForceMode.Impulse);
+    
+            Destroy(creation, bulletAirTime);
+            timer = shotCooldown;
+        }
+
+        timer -= Time.deltaTime;
     }
 
     void MoveTo(GameObject targetObject)
@@ -95,10 +125,15 @@ public class EnemyController : MonoBehaviour
             FirstPersonController player = hit.transform.gameObject.GetComponent<FirstPersonController>();
             if (player != null)
             {
-                print(hit.transform.gameObject.name);
+                // print(hit.transform.gameObject.name);
                 return hit.transform.gameObject;
             }
         }
         return null;
+    }
+
+    private void OnTriggerEnter(Collider  other)
+    {
+        health--;
     }
 }
