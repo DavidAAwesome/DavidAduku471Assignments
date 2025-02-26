@@ -13,9 +13,12 @@ public class PlayerWalkState : PlayerBaseState
         playerStateManager.MovePlayer(playerStateManager.default_speed);
         
         //On what conditions do we leave the state?
-        if (playerStateManager.movement.magnitude <= 0)
+        if(playerStateManager.jumping)
+            playerStateManager.SwitchState(playerStateManager.jumpState);
+        else if (playerStateManager.movement.magnitude <= 0)
             playerStateManager.SwitchState(playerStateManager.idleState);
         else if(playerStateManager.isSneaking)
             playerStateManager.SwitchState(playerStateManager.sneakState);
     }
+    
 }

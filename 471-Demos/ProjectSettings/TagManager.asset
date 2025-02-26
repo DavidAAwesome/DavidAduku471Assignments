@@ -9,6 +9,8 @@ TagManager:
   - JumpPad
   - Enemy
   - PlayerBullet
+  - Bush
+  - JumpTrigger
   layers:
   - Default
   - TransparentFX

@@ -13,7 +13,12 @@ public class PlayerIdleState : PlayerBaseState
         //Nothing!
         
         //On what conditions do we leave the state?
-        if (playerStateManager.movement.magnitude > 0.1)
+        if (playerStateManager.jumping)
+        {
+            playerStateManager.jumping = false;
+            playerStateManager.SwitchState(playerStateManager.jumpState);
+        }
+        else if (playerStateManager.movement.magnitude > 0)
         {
             if (playerStateManager.isSneaking)
             {
@@ -25,9 +30,10 @@ public class PlayerIdleState : PlayerBaseState
             }
             
         }
-        
-            
-        
+        else if(playerStateManager.isSneaking)
+            playerStateManager.SwitchState(playerStateManager.sneakState);
         
     }
+
+    
 }
