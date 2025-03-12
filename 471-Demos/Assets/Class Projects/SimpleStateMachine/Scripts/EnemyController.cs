@@ -15,6 +15,8 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private GameObject[] route;
     private GameObject target;
     private int routeIndex = 0;
+
+    private Animator anim;
     
     private enum State
     {
@@ -27,7 +29,7 @@ public class EnemyController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -51,6 +53,7 @@ public class EnemyController : MonoBehaviour
 
     void OnPace()
     {
+        anim.SetBool("Following", false);
         //What do we do when we're pacing?
         // print("I'm pacing!");
         target = route[routeIndex];
@@ -78,6 +81,7 @@ public class EnemyController : MonoBehaviour
 
     void OnFollow()
     {
+        anim.SetBool("Following", true);
         //What do we do when we are following?
         // print("I'm following!");
         MoveTo(target);
@@ -113,6 +117,8 @@ public class EnemyController : MonoBehaviour
     {
         transform.position = Vector3.MoveTowards(transform.position, targetObject.transform.position, speed * Time.deltaTime);
         transform.LookAt(targetObject.transform, Vector3.up);
+        // Vector3 look = Vector3.RotateTowards(transform.forward, targetObject.transform.position, 0.5f, 0.5f);
+        // transform.rotation = Quaternion.LookRotation(look);
     }
 
     GameObject CheckForward()
@@ -127,7 +133,7 @@ public class EnemyController : MonoBehaviour
             if (player != null)
             {
                 
-                if(player.currentState != player.sneakState) 
+                if(!player.isHiding) 
                     return hit.transform.gameObject;
                 // print(hit.transform.gameObject.name);
                 
